@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Laboratory Diagnostic Report - {{ report.report_number }}</title>
+<style>
+    @page {
+        size: A4;
+        margin: 15mm 15mm 20mm 15mm;
+    }
+    body {
+        font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+        color: #1e293b;
+        font-size: 12px;
+        line-height: 1.4;
+        margin: 0;
+        padding: 0;
+    }
+    .header-table {
+        width: 100%;
+        border-bottom: 2px solid #0284c7;
+        padding-bottom: 12px;
+        margin-bottom: 15px;
+    }
+    .lab-title {
+        font-size: 20px;
+        font-weight: 800;
+        color: #0369a1;
+        letter-spacing: -0.5px;
+    }
+    .lab-subtitle {
+        font-size: 10px;
+        color: #64748b;
+        margin-top: 2px;
+    }
+    .report-badge {
+        display: inline-block;
+        padding: 4px 10px;
+        border-radius: 4px;
+        font-weight: 700;
+        font-size: 11px;
+        text-transform: uppercase;
+        background: #0284c7;
+        color: white;
+        text-align: right;
+    }
+    .patient-box {
+        width: 100%;
+        background-color: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 6px;
+        padding: 10px 14px;
+        margin-bottom: 18px;
+    }
+    .patient-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    .patient-table td {
+        padding: 3px 6px;
+        font-size: 11px;
+    }
+    .label {
+        font-weight: 600;
+        color: #475569;
+        width: 15%;
+    }
+    .val {
+        font-weight: 700;
+        color: #0f172a;
+        width: 35%;
+    }
+    .section-title {
+        font-size: 13px;
+        font-weight: 800;
+        color: #0f172a;
+        background: #f1f5f9;
+        padding: 6px 10px;
+        border-left: 4px solid #0284c7;
+        margin-top: 14px;
+        margin-bottom: 8px;
+        text-transform: uppercase;
+    }
+    .results-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 14px;
+    }
+    .results-table th {
+        background-color: #0f172a;
+        color: white;
+        font-size: 10px;
+        font-weight: 700;
+        text-transform: uppercase;
+        padding: 7px 8px;
+        text-align: left;
+    }
+    .results-table td {
+        padding: 6px 8px;
+        border-bottom: 1px solid #f1f5f9;
+        font-size: 11px;
+    }
+    .results-table tr:nth-child(even) {
+        background-color: #fafafa;
+    }
+    .flag-normal {
+        color: #15803d;
+        font-weight: 600;
+    }
+    .flag-abnormal {
+        color: #b91c1c;
+        font-weight: 800;
+    }
+    .flag-critical {
+        color: #ffffff;
+        background: #dc2626;
+        padding: 2px 6px;
+        border-radius: 3px;
+        font-weight: 800;
+    }
+    .flag-tag {
+        display: inline-block;
+        padding: 1px 6px;
+        border-radius: 3px;
+        font-size: 9px;
+        font-weight: 800;
+        text-transform: uppercase;
+    }
+    .tag-NORMAL { background: #dcfce7; color: #166534; }
+    .tag-HIGH { background: #ffedd5; color: #c2410c; }
+    .tag-LOW { background: #fef9c3; color: #854d0e; }
+    .tag-CRITICAL_HIGH, .tag-CRITICAL_LOW { background: #fee2e2; color: #991b1b; }
+    
+    .doctor-notes-box {
+        background: #fffbeb;
+        border: 1px solid #fde68a;
+        border-radius: 6px;
+        padding: 8px 12px;
+        margin-top: 10px;
+        margin-bottom: 15px;
+    }
+    .footer-table {
+        width: 100%;
+        margin-top: 20px;
+        border-top: 1px solid #e2e8f0;
+        padding-top: 12px;
+    }
+    .signature-container {
+        text-align: right;
+    }
+    .sig-img {
+        max-height: 45px;
+        display: block;
+        margin-left: auto;
+    }
+    .qr-container {
+        text-align: left;
+    }
+    .qr-img {
+        width: 70px;
+        height: 70px;
+    }
+    .disclaimer {
+        font-size: 9px;
+        color: #94a3b8;
+        text-align: center;
+        margin-top: 16px;
+        border-top: 1px dashed #cbd5e1;
+        padding-top: 8px;
+    }
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<table class="header-table">
+    <tr>
+        <td style="width: 70%;">
+            <div class="lab-title">{{ lab.name }}</div>
+            <div class="lab-subtitle">{{ lab.address }}</div>
+            <div class="lab-subtitle">Tel: {{ lab.phone }} | Email: {{ lab.email }} | {{ lab.accreditation }}</div>
+        </td>
+        <td style="width: 30%; text-align: right; vertical-align: top;">
+            <div class="report-badge">{{ report.status }} REPORT</div>
+            <div style="font-size: 10px; color: #64748b; margin-top: 4px;">Report #: <strong>{{ report.report_number }}</strong></div>
+            <div style="font-size: 10px; color: #64748b;">Order #: <strong>{{ order.order_number }}</strong></div>
+        </td>
+    </tr>
+</table>
+
+<!-- Patient Demographics Box -->
+<div class="patient-box">
+    <table class="patient-table">
+        <tr>
+            <td class="label">Patient Name:</td>
+            <td class="val">{{ patient.full_name }}</td>
+            <td class="label">Patient ID:</td>
+            <td class="val">{{ patient.patient_code }}</td>
+        </tr>
+        <tr>
+            <td class="label">Age / Gender:</td>
+            <td class="val">{{ patient.age_years }} Yrs / {{ patient.gender }}</td>
+            <td class="label">Blood Group:</td>
+            <td class="val">{{ patient.blood_group }}</td>
+        </tr>
+        <tr>
+            <td class="label">Ref. Doctor:</td>
+            <td class="val">{{ order.referring_doctor or 'Self / Walk-in' }}</td>
+            <td class="label">Order Date:</td>
+            <td class="val">{{ order.created_at.strftime('%d-%b-%Y %H:%M') }}</td>
+        </tr>
+        <tr>
+            <td class="label">Priority:</td>
+            <td class="val"><strong style="color: {{ '#dc2626' if order.priority == 'STAT' else '#0284c7' }}">{{ order.priority }}</strong></td>
+            <td class="label">Report Verified:</td>
+            <td class="val">{{ report.verified_at.strftime('%d-%b-%Y %H:%M') if report.verified_at else 'Pending Sign-off' }}</td>
+        </tr>
+    </table>
+</div>
+
+<!-- Test Results -->
+{% for item in order.order_items %}
+<div class="section-title">{{ item.test.name }} ({{ item.test.test_code }}) - Specimen: {{ item.test.specimen_type }}</div>
+<table class="results-table">
+    <thead>
+        <tr>
+            <th style="width: 35%;">Investigation / Parameter</th>
+            <th style="width: 20%;">Observed Value</th>
+            <th style="width: 15%;">Unit</th>
+            <th style="width: 20%;">Biological Ref. Interval</th>
+            <th style="width: 10%; text-align: center;">Status</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for res in item.results %}
+        <tr>
+            <td><strong>{{ res.parameter.name }}</strong></td>
+            <td class="{{ 'flag-abnormal' if res.is_abnormal else 'flag-normal' }}">
+                <strong>{{ res.formatted_value }}</strong>
+                {% if res.is_critical %}
+                <span class="flag-critical">CRITICAL</span>
+                {% endif %}
+            </td>
+            <td>{{ res.parameter.unit or '-' }}</td>
+            <td style="color: #475569;">{{ res.reference_range_display or '-' }}</td>
+            <td style="text-align: center;">
+                <span class="flag-tag tag-{{ res.flag }}">{{ res.flag }}</span>
+            </td>
+        </tr>
+        {% if res.technician_notes %}
+        <tr>
+            <td colspan="5" style="font-size: 10px; color: #64748b; padding-left: 14px; font-style: italic;">
+                Note: {{ res.technician_notes }}
+            </td>
+        </tr>
+        {% endif %}
+        {% endfor %}
+    </tbody>
+</table>
+{% endfor %}
+
+<!-- Pathologist Remarks -->
+{% if report.pathologist_comments or report.clinical_interpretation %}
+<div class="doctor-notes-box">
+    <div style="font-weight: 700; font-size: 11px; color: #92400e; margin-bottom: 2px;">PATHOLOGIST REMARKS & CLINICAL INTERPRETATION:</div>
+    {% if report.pathologist_comments %}
+    <div style="font-size: 11px; color: #78350f;">{{ report.pathologist_comments }}</div>
+    {% endif %}
+    {% if report.clinical_interpretation %}
+    <div style="font-size: 10px; color: #451a03; margin-top: 4px; font-weight: 600;">Interpretation: {{ report.clinical_interpretation }}</div>
+    {% endif %}
+</div>
+{% endif %}
+
+<!-- Footer with Sign-off and QR code -->
+<table class="footer-table">
+    <tr>
+        <td style="width: 40%;" class="qr-container">
+            {% if qr_base64 %}
+            <img src="{{ qr_base64 }}" class="qr-img" alt="Verification QR">
+            {% endif %}
+            <div style="font-size: 8px; color: #64748b; margin-top: 2px;">Scan QR to verify original electronic laboratory record.</div>
+            <div style="font-size: 8px; color: #94a3b8;">Hash: {{ report.verification_qr_hash[:16] }}...</div>
+        </td>
+        <td style="width: 60%;" class="signature-container">
+            {% if doctor and doctor.signature_image_url %}
+            <img src="{{ doctor.signature_image_url }}" class="sig-img" alt="Doctor Signature">
+            {% else %}
+            <div style="height: 35px;"></div>
+            {% endif %}
+            <div style="font-weight: 800; font-size: 11px; color: #0f172a;">{{ doctor.full_name if doctor else 'Medical Director, MD' }}</div>
+            <div style="font-size: 10px; color: #64748b;">{{ doctor.department if doctor else 'Consultant Pathologist' }}</div>
+            <div style="font-size: 9px; color: #94a3b8;">License: {{ doctor.license_number if doctor else 'MD-PATH-REG' }}</div>
+        </td>
+    </tr>
+</table>
+
+<div class="disclaimer">
+    * Tests performed at {{ lab.name }}. All critical values are immediately alerted to ordering clinicians. This electronic report is digitally signed and authenticated.
+</div>
+
+</body>
+</html>
