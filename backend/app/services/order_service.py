@@ -170,7 +170,8 @@ class OrderService:
             select(Order)
             .options(
                 selectinload(Order.patient),
-                selectinload(Order.order_items).selectinload(OrderItem.test),
+                selectinload(Order.order_items).selectinload(OrderItem.test).selectinload(Test.category),
+                selectinload(Order.order_items).selectinload(OrderItem.test).selectinload(Test.parameters).selectinload(TestParameter.reference_ranges),
                 selectinload(Order.samples).selectinload(Sample.status_history),
                 selectinload(Order.invoice).selectinload(Invoice.payments),
                 selectinload(Order.lab_report)
@@ -194,7 +195,8 @@ class OrderService:
             select(Order)
             .options(
                 selectinload(Order.patient),
-                selectinload(Order.order_items).selectinload(OrderItem.test),
+                selectinload(Order.order_items).selectinload(OrderItem.test).selectinload(Test.category),
+                selectinload(Order.order_items).selectinload(OrderItem.test).selectinload(Test.parameters).selectinload(TestParameter.reference_ranges),
                 selectinload(Order.invoice).selectinload(Invoice.payments),
                 selectinload(Order.lab_report)
             )

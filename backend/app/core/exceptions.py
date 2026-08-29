@@ -16,7 +16,7 @@ class ClinicalLMSException(HTTPException):
 class NotFoundException(ClinicalLMSException):
     def __init__(self, resource_name: str, identifier: Any):
         super().__init__(
-            status_code=status_code.HTTP_404_NOT_FOUND,
+            status_code=status.HTTP_404_NOT_FOUND,
             detail=f"{resource_name} with identifier '{identifier}' was not found."
         )
 
@@ -24,7 +24,7 @@ class NotFoundException(ClinicalLMSException):
 class UnauthorizedException(ClinicalLMSException):
     def __init__(self, detail: str = "Invalid credentials or authorization token expired."):
         super().__init__(
-            status_code=status_code.HTTP_401_UNAUTHORIZED,
+            status_code=status.HTTP_401_UNAUTHORIZED,
             detail=detail,
             headers={"WWW-Authenticate": "Bearer"}
         )
@@ -33,7 +33,7 @@ class UnauthorizedException(ClinicalLMSException):
 class ForbiddenException(ClinicalLMSException):
     def __init__(self, detail: str = "You do not have permission to execute this clinical action."):
         super().__init__(
-            status_code=status_code.HTTP_403_FORBIDDEN,
+            status_code=status.HTTP_403_FORBIDDEN,
             detail=detail
         )
 
@@ -41,7 +41,7 @@ class ForbiddenException(ClinicalLMSException):
 class ConflictException(ClinicalLMSException):
     def __init__(self, detail: str):
         super().__init__(
-            status_code=status_code.HTTP_409_CONFLICT,
+            status_code=status.HTTP_409_CONFLICT,
             detail=detail
         )
 
@@ -49,6 +49,6 @@ class ConflictException(ClinicalLMSException):
 class ClinicalValidationError(ClinicalLMSException):
     def __init__(self, detail: str):
         super().__init__(
-            status_code=status_code.HTTP_422_UNPROCESSABLE_ENTITY,
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
             detail=detail
         )

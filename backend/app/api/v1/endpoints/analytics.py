@@ -36,7 +36,7 @@ async def get_most_requested_tests(
 
 @router.get("/revenue-trends", response_model=List[RevenueTrendPoint])
 async def get_revenue_trends(
-    period_type: str = Query("daily", regex="^(daily|monthly)$"),
+    period_type: str = Query("daily", pattern="^(daily|monthly)$"),
     payload: dict = Depends(require_roles([RoleEnum.ADMIN])),
     db: AsyncSession = Depends(get_db)
 ):
