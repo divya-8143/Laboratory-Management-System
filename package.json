@@ -1,0 +1,26 @@
+{
+  "name": "acupath-enterprise-laboratory-management-system",
+  "version": "1.0.0",
+  "private": true,
+  "description": "AcuPath Enterprise Laboratory Information & Management System (LIS / LMS)",
+  "scripts": {
+    "dev": "npm --prefix frontend run dev",
+    "build": "npm --prefix frontend run build",
+    "start": "python main.py",
+    "test": "python -m pytest backend/tests/ -v",
+    "lint": "npm --prefix frontend run lint"
+  },
+  "keywords": [
+    "laboratory-information-system",
+    "lis",
+    "lms",
+    "pathology",
+    "clinical-laboratory",
+    "fastapi",
+    "nextjs",
+    "hl7",
+    "fhir"
+  ],
+  "author": "AcuPath Health Technologies",
+  "dependencies": {}
+}
