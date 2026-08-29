@@ -1,11 +1,13 @@
 import os
 from typing import List, Optional
-from fastapi import APIRouter, Depends, Query, status, Response
+from fastapi import APIRouter, Depends, Query, status, Response, Security
 from fastapi.responses import FileResponse
+from fastapi.security import HTTPAuthorizationCredentials
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import get_db
-from app.core.permissions import require_roles, RoleEnum, get_current_user_payload
+from app.core.permissions import require_roles, RoleEnum, get_current_user_payload, security_scheme
+from app.core.security import decode_token
 from app.models.report import ReportStatusEnum
 from app.models.audit import AuditLog, AuditActionEnum
 from app.schemas.report import (
@@ -14,7 +16,7 @@ from app.schemas.report import (
     ReportVerificationPublicInfo
 )
 from app.services.report_service import ReportService
-from app.core.exceptions import NotFoundException
+from app.core.exceptions import NotFoundException, UnauthorizedException
 
 router = APIRouter(prefix="/reports", tags=["Reports & Medical Sign-off"])
 
@@ -74,15 +76,36 @@ async def verify_report(
 @router.get("/{report_id}/pdf")
 async def download_report_pdf(
     report_id: str,
-    payload: dict = Depends(get_current_user_payload),
+    token: Optional[str] = Query(None, description="Optional JWT token passed via URL parameter"),
+    credentials: Optional[HTTPAuthorizationCredentials] = Security(security_scheme),
     db: AsyncSession = Depends(get_db)
 ):
-    """Download official signed PDF laboratory report."""
+    """
+    Download official signed PDF laboratory report.
+    Accepts authentication via Authorization Bearer header, URL token parameter,
+    or allows public access if the report is already in VERIFIED state.
+    """
+    # 1. Check token in Authorization header or query param
+    raw_token = credentials.credentials if credentials else token
+    authenticated = False
+    user_id = None
+
+    if raw_token:
+        payload = decode_token(raw_token)
+        if payload and payload.get("type") == "access":
+            authenticated = True
+            user_id = payload.get("sub")
+
+    # 2. Fetch report
     report = await ReportService.get_report_by_id(db, report_id)
     if not report:
         raise NotFoundException("Report", report_id)
 
-    # Ensure PDF exists; if missing, generate on demand
+    # 3. If report is not verified and user is unauthenticated, require login
+    if not authenticated and report.status != ReportStatusEnum.VERIFIED:
+        raise UnauthorizedException("Authentication token required to download unverified draft reports.")
+
+    # 4. Ensure PDF exists; if missing, generate on demand
     if not report.pdf_path or not os.path.exists(report.pdf_path):
         from app.services.report_generator import ReportGeneratorService
         pdf_path = ReportGeneratorService.generate_pdf_report(
@@ -96,12 +119,24 @@ async def download_report_pdf(
         await db.commit()
 
     report.download_count += 1
+    
+    # Audit log report download
+    audit = AuditLog(
+        id=os.urandom(16).hex(),
+        user_id=user_id,
+        action=AuditActionEnum.DOWNLOAD_REPORT,
+        entity_name="LabReport",
+        entity_id=report.id,
+        details=f"Report {report.report_number} PDF downloaded."
+    )
+    db.add(audit)
     await db.commit()
 
     return FileResponse(
         path=report.pdf_path,
         media_type="application/pdf",
-        filename=f"{report.report_number}.pdf"
+        filename=f"{report.report_number}.pdf",
+        headers={"Content-Disposition": f"inline; filename={report.report_number}.pdf"}
     )
 
 

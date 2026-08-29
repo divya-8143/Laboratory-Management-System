@@ -863,7 +863,7 @@ export default function LISApp() {
                     )}
                     {rep.status === 'VERIFIED' && (
                       <a
-                        href={`http://localhost:8000/api/v1/reports/${rep.id}/pdf`}
+                        href={`http://localhost:8000/api/v1/reports/${rep.id}/pdf?token=${token || ''}`}
                         target="_blank"
                         rel="noreferrer"
                         className="flex-1 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-lg text-xs font-semibold flex items-center justify-center gap-1 shadow-sm text-center"
@@ -920,7 +920,7 @@ export default function LISApp() {
                       </td>
                       <td className="px-4 py-3 text-right">
                         <a
-                          href={`http://localhost:8000/api/v1/reports/${rep.id}/pdf`}
+                          href={`http://localhost:8000/api/v1/reports/${rep.id}/pdf?token=${token || ''}`}
                           target="_blank"
                           rel="noreferrer"
                           className="px-3 py-1.5 bg-slate-900 hover:bg-slate-800 text-white rounded text-xs font-semibold inline-flex items-center gap-1"
